@@ -33,11 +33,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.indigo,
-          title: Text(widget.title, style: TextStyle(color: Colors.white)),
-        ),
-        body: ImageListPage());
+    return Scaffold(body: ImageListPage());
   }
 }

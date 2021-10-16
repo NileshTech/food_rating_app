@@ -7,12 +7,15 @@ class ImageRatingWidget extends StatefulWidget {
   final String? serverFromFlickrAPI;
   final String? title;
 
+  final int? index;
+
   const ImageRatingWidget(
       {Key? key,
       this.secretFromFlickrAPI,
       this.idFromFlickrAPI,
       this.serverFromFlickrAPI,
-      this.title})
+      this.title,
+      this.index})
       : super(key: key);
 
   @override
@@ -20,39 +23,30 @@ class ImageRatingWidget extends StatefulWidget {
 }
 
 class _ImageRatingWidgetState extends State<ImageRatingWidget> {
-  double value = 0.5;
-  double rating = 0.5;
+  double? value;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 15.0),
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.black,
-                width: 1.0,
-              ),
-              borderRadius: BorderRadius.circular(20.0)),
-          child: Center(
-            child: Image.network(
-                'https://live.staticflickr.com/${widget.serverFromFlickrAPI}/${widget.idFromFlickrAPI}_${widget.secretFromFlickrAPI}.jpg'),
-          ),
-        ),
+    return Material(
+      elevation: 20,
+      child: InkWell(
+        child: Image.network(
+            'https://live.staticflickr.com/${widget.serverFromFlickrAPI}/${widget.idFromFlickrAPI}_${widget.secretFromFlickrAPI}.jpg',
+            fit: BoxFit.fill),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => RatingPage(
+                      secretFromFlickrAPI: widget.secretFromFlickrAPI,
+                      idFromFlickrAPI: widget.idFromFlickrAPI,
+                      serverFromFlickrAPI: widget.serverFromFlickrAPI,
+                      title: widget.title,
+                      index: widget.index,
+                    )),
+          );
+        },
       ),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => RatingPage(
-                    secretFromFlickrAPI: widget.secretFromFlickrAPI,
-                    idFromFlickrAPI: widget.idFromFlickrAPI,
-                    serverFromFlickrAPI: widget.serverFromFlickrAPI,
-                    title: widget.title,
-                  )),
-        );
-      },
     );
   }
 }

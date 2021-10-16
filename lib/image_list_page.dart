@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import "package:flutter/material.dart";
-import 'package:food_rating/carousal_item_details.dart';
+import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:food_rating/data.dart';
 import 'package:food_rating/image_rating_widget.dart';
 import "package:http/http.dart" as http;
@@ -8,7 +8,15 @@ import "dart:convert";
 import "dart:async";
 
 class ImageListPage extends StatefulWidget {
-  const ImageListPage({Key? key}) : super(key: key);
+  final int? indexForRating;
+  final double? ratingFromUser;
+  final bool? showRating;
+  const ImageListPage(
+      {Key? key,
+      this.indexForRating,
+      this.ratingFromUser,
+      this.showRating = false})
+      : super(key: key);
 
   @override
   _ImageListPageState createState() => _ImageListPageState();
@@ -35,59 +43,133 @@ class _ImageListPageState extends State<ImageListPage> {
 
   @override
   Widget build(BuildContext context) {
+    double? rating = 0.5;
+
     return SafeArea(
       child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.indigo,
+            title:
+                Text("Food Rating App", style: TextStyle(color: Colors.white)),
+          ),
           body: Center(
-        child: data == null
-            ? CircularProgressIndicator(color: Colors.indigo)
-            : Padding(
-                padding: const EdgeInsets.only(top: 60.0),
-                child: Container(
-                  child: CarouselSlider.builder(
+            child: data == null
+                ? CircularProgressIndicator(color: Colors.indigo)
+                : CarouselSlider.builder(
                     itemCount: 10,
-                    itemBuilder: (BuildContext context, int itemIndex,
-                            int pageViewIndex) =>
-                        Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            child: ImageRatingWidget(
-                                secretFromFlickrAPI: data![itemIndex]["secret"],
-                                serverFromFlickrAPI: data![itemIndex]["server"],
-                                idFromFlickrAPI: data![itemIndex]["id"],
-                                title: data![itemIndex]["title"]),
-                          ),
-                        ),
-                        Positioned(
-                          left: 20,
-                          right: 20,
-                          child: Container(
-                            height: MediaQuery.of(context).size.height * 0.05,
-                            decoration: BoxDecoration(
-                                color: Colors.amber[50],
-                                border: Border.all(
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(20.0)),
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  "${data![itemIndex]["title"]}",
-                                  style: TextStyle(fontSize: 20),
-                                  textAlign: TextAlign.center,
+                    itemBuilder: (BuildContext context, int? itemIndex,
+                        int pageViewIndex) {
+                      int? index = itemIndex;
+
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.lime.shade50,
+                              border: Border.all(
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(20.0)),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(5.0),
+                                  child: Text(
+                                    "${data![itemIndex!]["title"]}",
+                                    style: TextStyle(fontSize: 15),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
                               ),
-                            ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: ImageRatingWidget(
+                                  secretFromFlickrAPI: data![itemIndex]
+                                      ["secret"],
+                                  serverFromFlickrAPI: data![itemIndex]
+                                      ["server"],
+                                  idFromFlickrAPI: data![itemIndex]["id"],
+                                  title: data![itemIndex]["title"],
+                                  index: index,
+                                ),
+                              ),
+                              indexOfCarousalImages.keys
+                                      .contains(data![itemIndex]["title"])
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: RatingStars(
+                                        value: indexOfCarousalImages[
+                                            (data![itemIndex]["title"])]!,
+                                        starBuilder: (index, color) => Icon(
+                                          Icons.star_rate,
+                                          color: color,
+                                        ),
+                                        starCount: 5,
+                                        starSize: 20,
+                                        valueLabelColor:
+                                            const Color(0xff9b9b9b),
+                                        valueLabelRadius: 10,
+                                        maxValue: 5,
+                                        starSpacing: 3,
+                                        maxValueVisibility: true,
+                                        valueLabelVisibility: false,
+                                        animationDuration:
+                                            Duration(milliseconds: 1000),
+                                        valueLabelPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 1, horizontal: 8),
+                                        valueLabelMargin:
+                                            const EdgeInsets.only(right: 8),
+                                        starOffColor:
+                                            Colors.indigo.withOpacity(0.5),
+                                        starColor: Colors.indigo,
+                                      ),
+                                    )
+                                  : Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: RatingStars(
+                                        value: rating,
+                                        starBuilder: (index, color) => Icon(
+                                          Icons.star_rate,
+                                          color: color,
+                                        ),
+                                        starCount: 5,
+                                        starSize: 20,
+                                        valueLabelColor:
+                                            const Color(0xff9b9b9b),
+                                        valueLabelRadius: 10,
+                                        maxValue: 5,
+                                        starSpacing: 3,
+                                        maxValueVisibility: true,
+                                        valueLabelVisibility: false,
+                                        animationDuration:
+                                            Duration(milliseconds: 1000),
+                                        valueLabelPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 1, horizontal: 8),
+                                        valueLabelMargin:
+                                            const EdgeInsets.only(right: 8),
+                                        starOffColor:
+                                            Colors.indigo.withOpacity(0.5),
+                                        starColor: Colors.indigo,
+                                      ),
+                                    ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20.0),
+                                child: Text("${(itemIndex + 1)} / 10"),
+                              )
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                     options: CarouselOptions(
                       height: 400,
                       aspectRatio: 16 / 9,
-                      viewportFraction: 0.8,
+                      viewportFraction: 0.6,
                       initialPage: 0,
                       enableInfiniteScroll: true,
                       reverse: false,
@@ -99,9 +181,7 @@ class _ImageListPageState extends State<ImageListPage> {
                       scrollDirection: Axis.horizontal,
                     ),
                   ),
-                ),
-              ),
-      )),
+          )),
     );
   }
 }
